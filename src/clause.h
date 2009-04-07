@@ -20,22 +20,35 @@ along with Resolute.  If not, see <http://www.gnu.org/licenses/>.*/
 #include <string>
 #include <list>
 
-enum clauseSection_t{NONE, PREAMBLE, BODY};
-
 class Clause {
 public:
   Clause();
-  Clause(const std::string& phrase, const std::string& text, clauseSection_t section);
-  ~Clause();
+  Clause(const std::string& phrase, const std::string& text);
+  virtual ~Clause();
   std::string getPhrase() const;
   std::string getText() const;
-  const clauseSection_t getSection() const;
   void setPhrase(const std::string& phrase);
   void setText(const std::string& text);
-  void setSection( const clauseSection_t& section);
   bool operator==(const Clause& other);
+  virtual bool isOperative() const = 0;
 private:
   std::string m_phrase, m_text;
-  clauseSection_t m_section;
 };
+
+class PreambulatoryClause : public Clause {
+public:
+  PreambulatoryClause();
+  PreambulatoryClause(const std::string& phrase, const std::string& text);
+  ~PreambulatoryClause();
+  virtual bool isOperative() const {return false;}
+};
+
+class OperativeClause : public Clause {
+public:
+  OperativeClause();
+  OperativeClause(const std::string& phrase, const std::string& text);
+  ~OperativeClause();
+  virtual bool isOperative() const {return true;}
+};
+
 #endif //CLAUSE_H

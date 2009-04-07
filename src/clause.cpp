@@ -20,12 +20,10 @@ along with Resolute.  If not, see <http://www.gnu.org/licenses/>.*/
 Clause::Clause() {
   m_phrase = "";
   m_text = "";
-  m_section = NONE;
 }
-Clause::Clause(const std::string& phrase, const std::string& text, clauseSection_t section) {
+Clause::Clause(const std::string& phrase, const std::string& text) {
   m_phrase = phrase;
   m_text = text;
-  m_section = section;
 }
 Clause::~Clause() {}
 std::string Clause::getPhrase() const {
@@ -34,22 +32,28 @@ std::string Clause::getPhrase() const {
 std::string Clause::getText() const {
   return m_text;
 }
-const clauseSection_t Clause::getSection() const {
-  return m_section;
-}
 void Clause::setPhrase( const std::string& phrase ) {
   m_phrase = phrase;
 }
 void Clause::setText(const std::string& text) {
   m_text=text;
 }
-void Clause::setSection( const clauseSection_t& section) {
-  m_section = section;
-}
 bool Clause::operator==(const Clause& other) {
-  if(m_section == other.getSection() && m_phrase == other.getPhrase() && m_text == other.getText()) {
+  if(m_phrase == other.getPhrase() && m_text == other.getText()) {
     return true;
   }
   else
     return false;
+}
+
+PreambulatoryClause::PreambulatoryClause() {}
+PreambulatoryClause::PreambulatoryClause(const std::string& phrase, const std::string& text)
+  :Clause(phrase, text) {
+}
+PreambulatoryClause::~PreambulatoryClause() {}
+OperativeClause::OperativeClause() {}
+OperativeClause::OperativeClause(const std::string& phrase, const std::string& text)
+  :Clause(phrase, text) {
+}
+OperativeClause::~OperativeClause() {
 }

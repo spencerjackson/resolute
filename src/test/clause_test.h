@@ -28,7 +28,6 @@ class ClauseTest : public CppUnit::TestFixture {
   CPPUNIT_TEST_SUITE_END();
 private:
   std::string phrase1, text1, phrase2, text2;
-  clauseSection_t type1, type2;
   Clause *clause1a, *clause1b, *clause2;
 public:
   void setUp();
