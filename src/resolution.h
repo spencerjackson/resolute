@@ -20,6 +20,7 @@ along with Resolute.  If not, see <http://www.gnu.org/licenses/>.*/
 
 #include <list>
 #include <string>
+
 #include "clause.h"
 
 class Resolution {
@@ -29,22 +30,27 @@ public:
   ~Resolution();
   void serialize(std::string path);
   void deserialize(std::string path);
-  void insertClause(Clause clause);
-  void insertClause(int pos, Clause clause);
-  void replaceClause(const Clause& original, const Clause& updated);
-  void deleteClause(Clause& clause);
   void addSignature(const std::string& signature);
   std::string getIssue() const;
   std::string getMainSubmitter() const;
   void setIssue(std::string issue);
   void setMainSubmitter(std::string mainSubmitter);
+  void insertClause(Clause& clause, const int& pos=-1);
+  void removeClause(Clause& clause);
+
+  ClauseComposition* getPreamble();
+  ClauseComposition* getBody();
+
+  void set_preamble(const ClauseComposition& preamble);
+  void set_body(const ClauseComposition& body);
 
 protected:
   std::string m_issue;
   std::string m_mainSubmitter;
   std::string m_committee, m_committee_name;
   std::list<std::string> m_signatures;
-  std::list<Clause> m_preamble, m_body;
+  ClauseComposition *preamble;
+  ClauseComposition *body;
 };
 
 #endif //RESOLUTION_H

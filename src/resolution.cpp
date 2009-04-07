@@ -18,6 +18,8 @@ along with Resolute.  If not, see <http://www.gnu.org/licenses/>.*/
 #include "resolution.h"
 
 Resolution::Resolution() {
+  preamble = new ClauseComposition;
+  body = new ClauseComposition;
 }
 
 Resolution::Resolution(std::string path) {
@@ -25,6 +27,8 @@ Resolution::Resolution(std::string path) {
 }
 
 Resolution::~Resolution() {
+  delete preamble;
+  delete body;
 }
 
 void Resolution::serialize(std::string path) {
@@ -33,48 +37,18 @@ void Resolution::serialize(std::string path) {
 void Resolution::deserialize(std::string path) {
 }
 
-void Resolution::insertClause(Clause clause) {
-  std::list<Clause>* section;
-  if(clause.getSection() == PREAMBLE) section = &m_preamble;
-  else if(clause.getSection() == BODY) section = &m_body;
-  section->push_back(clause);
-
-}
-void Resolution::insertClause(int pos, Clause clause) {
-  std::list<Clause>* section;
-  if(clause.getSection() == PREAMBLE) section = &m_preamble;
-  else if(clause.getSection() == BODY) section = &m_body;
-  std::list<Clause>::iterator iter = section->begin();
-  for(int i = 0; i<pos; i++) {
-    iter++;
-  }
-  section->insert(iter, clause);
-}
-void Resolution::replaceClause(const Clause& original, const Clause& updated) {
-  std::list<Clause>* section;
-  if (original.getSection() == PREAMBLE) section = &m_preamble;
-  else if(original.getSection() == BODY) section = &m_body;
-  for(std::list<Clause>::iterator i = section->begin(); i != section->end(); i++) {
-    if (*i == original) {
-      *i = updated;
-    }
-      //No clause found
-  }
-}
-void Resolution::deleteClause(Clause &clause) {
-  std::list<Clause>* section;
-  if (clause.getSection() == PREAMBLE) section = &m_preamble;
-  else if(clause.getSection() == BODY) section = &m_body;
-
-  for(std::list<Clause>::iterator i = section->begin(); i != section->end(); i++) {
-    if(*i == clause) {
-      section->erase(i);
-    }
-  }
-}
-
 void Resolution::addSignature(const std::string& signature) {
   m_signatures.push_back(signature);
+}
+
+void Resolution::insertClause(Clause& clause, const int& pos) {
+  if(clause.isOperative()) body->addClause(clause);
+  else preamble->addClause(clause);
+}
+
+void Resolution::removeClause(Clause& clause) {
+  if(clause.isOperative()) body->removeClause(clause);
+  else preamble->removeClause(clause);
 }
 
 std::string Resolution::getIssue() const {
@@ -92,3 +66,20 @@ void Resolution::setIssue(const std::string issue) {
 void Resolution::setMainSubmitter(const std::string mainSubmitter) {
   m_mainSubmitter = mainSubmitter;
 }
+
+ClauseComposition* Resolution::getPreamble() {
+  return preamble;
+}
+
+ClauseComposition* Resolution::getBody() {
+  return body;
+}
+
+void Resolution::set_preamble(const ClauseComposition& preamble) {
+  *(this->preamble) = preamble;
+}
+
+void Resolution::set_body(const ClauseComposition& body) {
+  *(this->body) = body;
+}
+

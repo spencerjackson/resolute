@@ -26,18 +26,23 @@ Clause::Clause(const std::string& phrase, const std::string& text) {
   m_text = text;
 }
 Clause::~Clause() {}
+
 std::string Clause::getPhrase() const {
   return m_phrase;
 }
+
 std::string Clause::getText() const {
   return m_text;
 }
-void Clause::setPhrase( const std::string& phrase ) {
+
+void Clause::setPhrase(const std::string& phrase) {
   m_phrase = phrase;
 }
+
 void Clause::setText(const std::string& text) {
   m_text=text;
 }
+
 bool Clause::operator==(const Clause& other) {
   if(m_phrase == other.getPhrase() && m_text == other.getText()) {
     return true;
@@ -56,4 +61,31 @@ OperativeClause::OperativeClause(const std::string& phrase, const std::string& t
   :Clause(phrase, text) {
 }
 OperativeClause::~OperativeClause() {
+}
+
+ClauseComposition::ClauseComposition() {
+}
+
+ClauseComposition::~ClauseComposition() {
+}
+
+void ClauseComposition::addClause(Clause& clause){
+  m_clauses.push_back(&clause);
+}
+void ClauseComposition::removeClause(Clause& clause){
+  for(std::deque<Clause*>::iterator i = m_clauses.begin(); i != m_clauses.end();i++){
+    if(&clause==*i) m_clauses.erase(i);
+  }
+}
+
+std::deque<Clause*>::iterator ClauseComposition::getBegin() {
+  return m_clauses.begin();
+}
+
+std::deque<Clause*>::iterator ClauseComposition::getEnd() {
+  return m_clauses.end();
+}
+
+unsigned int ClauseComposition::size() {
+  return m_clauses.size();
 }

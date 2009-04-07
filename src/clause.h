@@ -17,38 +17,62 @@ along with Resolute.  If not, see <http://www.gnu.org/licenses/>.*/
 
 #ifndef CLAUSE_H
 #define CLAUSE_H
-#include <string>
-#include <list>
 
-class Clause {
-public:
+#include <string>
+#include <deque>
+
+class ClauseComponent {
+};
+
+class Clause : public virtual ClauseComponent {
+ public:
   Clause();
   Clause(const std::string& phrase, const std::string& text);
   virtual ~Clause();
-  std::string getPhrase() const;
-  std::string getText() const;
-  void setPhrase(const std::string& phrase);
-  void setText(const std::string& text);
-  bool operator==(const Clause& other);
+
+  virtual std::string getPhrase() const;
+  virtual std::string getText() const;
+  virtual void setPhrase(const std::string& phrase);
+  virtual void setText(const std::string& text);
+
+  virtual bool operator==(const Clause& other);
   virtual bool isOperative() const = 0;
-private:
+ protected:
   std::string m_phrase, m_text;
 };
 
 class PreambulatoryClause : public Clause {
-public:
+ public:
   PreambulatoryClause();
   PreambulatoryClause(const std::string& phrase, const std::string& text);
   ~PreambulatoryClause();
   virtual bool isOperative() const {return false;}
-};
+ };
 
-class OperativeClause : public Clause {
-public:
+class ClauseComposition : public virtual ClauseComponent {
+  //This class is a list of clauses
+ public:
+  ClauseComposition();
+  ~ClauseComposition();
+
+  void addClause(Clause& clause);
+  void removeClause(Clause& clause);
+
+  std::deque<Clause*>::iterator getBegin();
+  std::deque<Clause*>::iterator getEnd();
+  unsigned int size();
+
+ protected:
+  std::deque<Clause*> m_clauses;
+ };
+
+class OperativeClause : public Clause, public ClauseComposition {
+ public:
   OperativeClause();
   OperativeClause(const std::string& phrase, const std::string& text);
   ~OperativeClause();
   virtual bool isOperative() const {return true;}
-};
+ };
+
 
 #endif //CLAUSE_H
