@@ -16,12 +16,12 @@ You should have received a copy of the GNU General Public License
 along with Resolute.  If not, see <http://www.gnu.org/licenses/>.*/
 
 #include <gtkmm/main.h>
-#include <gtkmm/window.h>
+#include "resolute.h"
 
 int main(int argc, char* argv[]) {
   Gtk::Main kit(argc, argv);
-  Gtk::Window window;
-  Gtk::Main::run(window);
+  Resolute resolute;
+  Gtk::Main::run(resolute);
 
   return 0;
 }

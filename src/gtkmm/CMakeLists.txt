@@ -5,7 +5,8 @@ include_directories(
     ${GTKMM_INCLUDE_DIRS}  )
 
 add_executable(resolute
-    main.cpp )
+    main.cpp
+    resolute.cpp )
 
 target_link_libraries(resolute
     ${GTKMM_LIBRARIES}  )
