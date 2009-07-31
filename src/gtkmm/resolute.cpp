@@ -24,6 +24,8 @@ Resolute::Resolute() {
 
   add(m_vbox);
 
+  m_resolution = NULL;
+
     //Create menu
     m_actiongroup = Gtk::ActionGroup::create();
     //Create File menu
@@ -69,7 +71,12 @@ Resolute::~Resolute() {
 }
 
 void Resolute::on_action_file_new() {
-  std::cout << "New Resolution. Functionality not yet implemented." << std::endl;
+  if (m_resolution) {
+    delete m_resolution;
+  }
+  m_resolution = new GtkResolution;
+  m_resolution->show();
+  m_vbox.pack_start(*m_resolution);
 }
 
 void Resolute::on_action_file_open() {
@@ -85,6 +92,7 @@ void Resolute::on_action_file_saveas() {
 }
 
 void Resolute::on_action_file_quit() {
+  delete m_resolution;
   hide();
 }
 
