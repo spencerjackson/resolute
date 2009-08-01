@@ -64,10 +64,20 @@ Resolute::Resolute() {
     m_vbox.pack_start(*pMenubar, Gtk::PACK_SHRINK);
     pMenubar->show();
 
+    about.signal_response().connect(sigc::mem_fun(*this, &Resolute::on_about_response));
+
     show_all_children();
 }
 
 Resolute::~Resolute() {
+}
+
+void Resolute::on_about_response(int response_id) {
+  if((response_id == Gtk::RESPONSE_CLOSE) ||
+     (response_id == Gtk::RESPONSE_CANCEL) )
+    {
+      about.hide();
+    }
 }
 
 void Resolute::on_action_file_new() {
@@ -97,5 +107,6 @@ void Resolute::on_action_file_quit() {
 }
 
 void Resolute::on_action_help_about() {
-  std::cout << "About Resolute. Functionality not yet implemented." << std::endl;
+  about.show();
+  about.present();
 }

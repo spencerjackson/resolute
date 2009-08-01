@@ -7,6 +7,7 @@ include_directories(
 add_executable(resolute
     ${SOURCES}
     main.cpp
+    about.cpp
     resolute.cpp
     gtkResolution.cpp )
 

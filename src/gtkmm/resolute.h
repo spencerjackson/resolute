@@ -26,6 +26,7 @@ along with Resolute.  If not, see <http://www.gnu.org/licenses/>.*/
 #include <gtkmm/box.h>
 #include <gtkmm/stock.h>
 
+#include "about.h"
 #include "gtkResolution.h"
 
 class Resolute : public Gtk::Window {
@@ -41,6 +42,9 @@ class Resolute : public Gtk::Window {
   Glib::RefPtr<Gtk::ActionGroup> m_actiongroup;
 
   GtkResolution* m_resolution;
+
+  About about;
+  void on_about_response(int response_id);
 
   virtual void on_action_file_new();
   virtual void on_action_file_open();
