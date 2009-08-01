@@ -34,11 +34,14 @@ void GtkResolution::init() {
   m_title_label.set_label("Issue");
   m_header_box.pack_start(m_title_label, Gtk::PACK_SHRINK);
   m_header_box.pack_start(m_title, Gtk::PACK_SHRINK);
+  m_title.signal_changed().connect(sigc::mem_fun(*this, &GtkResolution::on_title_changed));
+  m_title.set_text(m_resolution->getIssue());
   m_submitter_label.set_label("Main Submitter");
   m_header_box.pack_start(m_submitter_label, Gtk::PACK_SHRINK);
   m_header_box.pack_start(m_submitter_entry, Gtk::PACK_SHRINK);
   pack_start(m_header_box, Gtk::PACK_SHRINK);
-
+  m_submitter_entry.signal_changed().connect(sigc::mem_fun(*this, &GtkResolution::on_main_submitter_changed));
+  m_submitter_entry.set_text(m_resolution->getMainSubmitter());
   pack_start(m_sponsor_scrolledwindow);
   m_sponsor_scrolledwindow.add(m_sponsor_view);
   m_sponsor_scrolledwindow.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
@@ -87,4 +90,12 @@ void GtkResolution::init() {
 
 
   show_all_children();
+}
+
+void GtkResolution::on_title_changed() {
+  m_resolution->setIssue(m_title.get_text());
+}
+
+void GtkResolution::on_main_submitter_changed() {
+  m_resolution->setMainSubmitter(m_submitter_entry.get_text());
 }

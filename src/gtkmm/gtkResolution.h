@@ -61,6 +61,9 @@ protected:
   Gtk::TreeView m_body_view;
 
   Resolution* m_resolution;
+
+  void on_title_changed();
+  void on_main_submitter_changed();
 };
 
 #endif //GTKRESOLUTION_H
