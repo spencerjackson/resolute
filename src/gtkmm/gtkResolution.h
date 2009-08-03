@@ -21,9 +21,12 @@ along with Resolute.  If not, see <http://www.gnu.org/licenses/>.*/
 #include <gtkmm/box.h>
 #include <gtkmm/entry.h>
 #include <gtkmm/label.h>
+#include <gtkmm/button.h>
 #include <gtkmm/frame.h>
 #include <gtkmm/scrolledwindow.h>
 #include <glibmm/refptr.h>
+#include <gtkmm/paned.h>
+#include <gtkmm/textview.h>
 #include <gtkmm/liststore.h>
 #include <gtkmm/treestore.h>
 #include <gtkmm/treeview.h>
@@ -31,6 +34,7 @@ along with Resolute.  If not, see <http://www.gnu.org/licenses/>.*/
 #include "modelColumns.h"
 
 #include "../resolution.h"
+#include "../clause.h"
 
 class GtkResolution : public Gtk::VBox {
 public:
@@ -48,22 +52,25 @@ protected:
   Glib::RefPtr<Gtk::ListStore> m_refSponsorsModel;
   Gtk::TreeView m_sponsor_view;
 
-  Gtk::Frame m_preamble_frame;
-  Gtk::VBox m_preamble_box;
-  Gtk::ScrolledWindow m_preamble_scrolledwindow;
-  Glib::RefPtr<Gtk::ListStore> m_refPreambleModel;
-  Gtk::TreeView m_preamble_view;
+  Gtk::VPaned m_VPaned;
+  Gtk::ScrolledWindow m_ResolutionScrolledWindow;
+  Gtk::TreeView m_ResolutionTreeView;
+  Glib::RefPtr<Gtk::TreeStore> m_refResolutionModel;
+  Gtk::VBox m_ClauseVBox;
+  Gtk::Button m_ClauseAddButton;
+  Gtk::HBox m_ClausePhraseHBox;
+  Gtk::Label m_ClausePhraseLabel;
+  Gtk::Entry m_ClausePhraseEntry;
+  Gtk::ScrolledWindow m_ClauseTextScrolledWindow;
+  Gtk::TextView m_ClauseText;
 
-  Gtk::Frame m_body_frame;
-  Gtk::VBox m_body_box;
-  Gtk::ScrolledWindow m_body_scrolledwindow;
-  Glib::RefPtr<Gtk::TreeStore> m_refBodyModel;
-  Gtk::TreeView m_body_view;
+  void populate_model_from_resolution();
 
   Resolution* m_resolution;
 
   void on_title_changed();
   void on_main_submitter_changed();
+
 };
 
 #endif //GTKRESOLUTION_H

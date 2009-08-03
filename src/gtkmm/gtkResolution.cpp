@@ -54,40 +54,26 @@ void GtkResolution::init() {
     row[m_sponsorColumns.m_sponsor] = "China";
   }
 
-
-  pack_start(m_preamble_frame);
-  m_preamble_frame.set_label("Preamble");
-  m_preamble_frame.add(m_preamble_box);
-  m_preamble_box.add(m_preamble_scrolledwindow);
-  m_preamble_scrolledwindow.add(m_preamble_view);
-  m_preamble_scrolledwindow.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+  pack_start(m_VPaned);
+  m_VPaned.add1(m_ResolutionScrolledWindow);
+  m_ResolutionScrolledWindow.add(m_ResolutionTreeView);
+  m_ResolutionScrolledWindow.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
   resolutionColumns m_resolutionColumns;
-  m_preamble_view.append_column("Phrase", m_resolutionColumns.m_phrase);
-  m_preamble_view.append_column("Text", m_resolutionColumns.m_text);
-  m_refPreambleModel = Gtk::ListStore::create(m_resolutionColumns);
-  m_preamble_view.set_model(m_refPreambleModel);
-  for(int i = 0; i < 50; i++) {
-    Gtk::TreeModel::Row row = *(m_refPreambleModel->append());
-    row[m_resolutionColumns.m_phrase] = "Understanding";
-    row[m_resolutionColumns.m_text] = "the issue";
-  }
-
-  pack_start(m_body_frame);
-  m_body_frame.set_label("Body");
-  m_body_frame.add(m_body_box);
-  m_body_box.add(m_body_scrolledwindow);
-  m_body_scrolledwindow.add(m_body_view);
-  m_body_scrolledwindow.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
-  m_body_view.append_column("Phrase", m_resolutionColumns.m_phrase);
-  m_body_view.append_column("Text", m_resolutionColumns.m_text);
-  m_refBodyModel = Gtk::TreeStore::create(m_resolutionColumns);
-  m_body_view.set_model(m_refBodyModel);
-  for(int i = 0; i < 50; i++) {
-    Gtk::TreeModel::Row row = *(m_refBodyModel->append());
-    row[m_resolutionColumns.m_phrase] = "Resolves";
-    row[m_resolutionColumns.m_text] = "to remain aware of the issue";
-  }
-
+  m_ResolutionTreeView.append_column("Phrase", m_resolutionColumns.m_phrase);
+  m_ResolutionTreeView.append_column("Text", m_resolutionColumns.m_phrase);
+  m_refResolutionModel = Gtk::TreeStore::create(m_resolutionColumns);
+  m_ResolutionTreeView.set_model(m_refResolutionModel);
+  populate_model_from_resolution();
+  m_VPaned.add2(m_ClauseVBox);
+  m_ClauseAddButton.set_label("Add a new Clause");
+  m_ClauseVBox.pack_start(m_ClauseAddButton, Gtk::PACK_SHRINK);
+  m_ClauseVBox.pack_start(m_ClausePhraseHBox, Gtk::PACK_SHRINK);
+  m_ClausePhraseHBox.pack_start(m_ClausePhraseLabel, Gtk::PACK_SHRINK);
+  m_ClausePhraseLabel.set_label("Phrase");
+  m_ClausePhraseHBox.pack_start(m_ClausePhraseEntry, Gtk::PACK_SHRINK);
+  m_ClauseVBox.pack_start(m_ClauseTextScrolledWindow);
+  m_ClauseTextScrolledWindow.add(m_ClauseText);
+  m_ClauseTextScrolledWindow.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
 
   show_all_children();
 }
@@ -98,4 +84,30 @@ void GtkResolution::on_title_changed() {
 
 void GtkResolution::on_main_submitter_changed() {
   m_resolution->setMainSubmitter(m_submitter_entry.get_text());
+}
+
+void GtkResolution::populate_model_from_resolution() {
+  Gtk::TreeModel::iterator iter = m_refResolutionModel->prepend();
+  Gtk::TreeModel::Row row;
+  resolutionColumns m_resolutionColumns;
+  row = *iter;
+  //Populate the preamble first...
+  ClauseComposition *preamble = m_resolution->getPreamble();
+  row[m_resolutionColumns.m_phrase] = "Preamble";
+  Gtk::TreeModel::iterator iter_child = m_refResolutionModel->append(row.children());
+  Gtk::TreeModel::Row row_child = *iter_child;
+  for(std::deque<Clause*>::iterator it = preamble->getBegin(); it != preamble->getEnd(); it++) {
+    row_child[m_resolutionColumns.m_phrase] = (*it)->getPhrase();
+    row_child[m_resolutionColumns.m_text] = (*it)->getText();
+  }
+  //Next populate the body
+  iter = m_refResolutionModel->prepend();
+  row = *iter;
+  ClauseComposition *body = m_resolution->getBody();
+  row[m_resolutionColumns.m_phrase] = "Body";
+  iter_child = m_refResolutionModel->append(row.children());
+  for(std::deque<Clause*>::iterator it = body->getBegin(); it != body->getEnd(); it++) {
+    row_child[m_resolutionColumns.m_phrase] = (*it)->getPhrase();
+    row_child[m_resolutionColumns.m_text] = (*it)->getText();
+  }
 }
