@@ -20,14 +20,14 @@ along with Resolute.  If not, see <http://www.gnu.org/licenses/>.*/
 #include <gtkmm/treemodel.h>
 #include <string>
 
-class sponsorColumns : public Gtk::TreeModel::ColumnRecord {
+class sponsorColumns : public Gtk::TreeModelColumnRecord {
 public:
   sponsorColumns() {add(m_sponsor);}
   ~sponsorColumns() {}
   Gtk::TreeModelColumn<std::string> m_sponsor;
 };
 
-class resolutionColumns : public Gtk::TreeModel::ColumnRecord {
+class resolutionColumns : public Gtk::TreeModelColumnRecord {
 public:
   resolutionColumns() {add(m_phrase); add(m_text);}
   ~resolutionColumns() {}

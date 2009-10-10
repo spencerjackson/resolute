@@ -45,6 +45,7 @@ void GtkResolution::init() {
   pack_start(m_sponsor_scrolledwindow);
   m_sponsor_scrolledwindow.add(m_sponsor_view);
   m_sponsor_scrolledwindow.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+
   sponsorColumns m_sponsorColumns;
   m_sponsor_view.append_column("Sponsors", m_sponsorColumns.m_sponsor);
   m_refSponsorsModel = Gtk::ListStore::create(m_sponsorColumns);
@@ -60,13 +61,18 @@ void GtkResolution::init() {
   m_ResolutionScrolledWindow.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
   resolutionColumns m_resolutionColumns;
   m_ResolutionTreeView.append_column("Phrase", m_resolutionColumns.m_phrase);
-  m_ResolutionTreeView.append_column("Text", m_resolutionColumns.m_phrase);
+  m_ResolutionTreeView.append_column("Text", m_resolutionColumns.m_text);
   m_refResolutionModel = Gtk::TreeStore::create(m_resolutionColumns);
   m_ResolutionTreeView.set_model(m_refResolutionModel);
   populate_model_from_resolution();
   m_VPaned.add2(m_ClauseVBox);
   m_ClauseAddButton.set_label("Add a new Clause");
+  m_ClauseAddButton.signal_clicked().connect(sigc::mem_fun(*this, &GtkResolution::on_add_clause_clicked));
+  m_SubClauseAddButton.set_label("Add a new Subclause");
+  m_ClauseDeleteButton.set_label("Delete a Clause");
   m_ClauseVBox.pack_start(m_ClauseAddButton, Gtk::PACK_SHRINK);
+  m_ClauseVBox.pack_start(m_SubClauseAddButton, Gtk::PACK_SHRINK);
+  m_ClauseVBox.pack_start(m_ClauseDeleteButton, Gtk::PACK_SHRINK);
   m_ClauseVBox.pack_start(m_ClausePhraseHBox, Gtk::PACK_SHRINK);
   m_ClausePhraseHBox.pack_start(m_ClausePhraseLabel, Gtk::PACK_SHRINK);
   m_ClausePhraseLabel.set_label("Phrase");
@@ -84,6 +90,16 @@ void GtkResolution::on_title_changed() {
 
 void GtkResolution::on_main_submitter_changed() {
   m_resolution->setMainSubmitter(m_submitter_entry.get_text());
+}
+
+void GtkResolution::on_add_clause_clicked() {
+  Gtk::TreeModel::iterator iter = m_ResolutionTreeView.get_selection()->get_selected();
+  Gtk::TreeModel::Row row = *iter;
+  resolutionColumns resolutionColumns;
+  Clause *clause;
+  std::string phrase = row[resolutionColumns.m_phrase];
+  if (phrase == "Preamble") clause = new PreambulatoryClause;
+  else if (phrase == "Body") clause = new OperativeClause;
 }
 
 void GtkResolution::populate_model_from_resolution() {

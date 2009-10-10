@@ -58,6 +58,8 @@ protected:
   Glib::RefPtr<Gtk::TreeStore> m_refResolutionModel;
   Gtk::VBox m_ClauseVBox;
   Gtk::Button m_ClauseAddButton;
+  Gtk::Button m_SubClauseAddButton;
+  Gtk::Button m_ClauseDeleteButton;
   Gtk::HBox m_ClausePhraseHBox;
   Gtk::Label m_ClausePhraseLabel;
   Gtk::Entry m_ClausePhraseEntry;
@@ -70,6 +72,7 @@ protected:
 
   void on_title_changed();
   void on_main_submitter_changed();
+  void on_add_clause_clicked();
 
 };
 
