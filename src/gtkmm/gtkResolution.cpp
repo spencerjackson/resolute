@@ -18,12 +18,6 @@ along with Resolute.  If not, see <http://www.gnu.org/licenses/>.*/
 #include "gtkResolution.h"
 
 GtkResolution::GtkResolution() {
-  m_resolution = new Resolution;
-  init();
-}
-
-GtkResolution::GtkResolution(Resolution* resolution) {
-  m_resolution = resolution;
   init();
 }
 
@@ -34,14 +28,12 @@ void GtkResolution::init() {
   m_title_label.set_label("Issue");
   m_header_box.pack_start(m_title_label, Gtk::PACK_SHRINK);
   m_header_box.pack_start(m_title, Gtk::PACK_SHRINK);
-  m_title.signal_changed().connect(sigc::mem_fun(*this, &GtkResolution::on_title_changed));
-  m_title.set_text(m_resolution->getIssue());
+  m_title.set_text("Issue");
   m_submitter_label.set_label("Main Submitter");
   m_header_box.pack_start(m_submitter_label, Gtk::PACK_SHRINK);
   m_header_box.pack_start(m_submitter_entry, Gtk::PACK_SHRINK);
   pack_start(m_header_box, Gtk::PACK_SHRINK);
-  m_submitter_entry.signal_changed().connect(sigc::mem_fun(*this, &GtkResolution::on_main_submitter_changed));
-  m_submitter_entry.set_text(m_resolution->getMainSubmitter());
+  m_submitter_entry.set_text("Main Submitter");
   pack_start(m_sponsor_scrolledwindow);
   m_sponsor_scrolledwindow.add(m_sponsor_view);
   m_sponsor_scrolledwindow.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
@@ -64,7 +56,6 @@ void GtkResolution::init() {
   m_ResolutionTreeView.append_column("Text", m_resolutionColumns.m_text);
   m_refResolutionModel = Gtk::TreeStore::create(m_resolutionColumns);
   m_ResolutionTreeView.set_model(m_refResolutionModel);
-  populate_model_from_resolution();
   m_VPaned.add2(m_ClauseVBox);
   m_ClauseAddButton.set_label("Add a new Clause");
   m_ClauseAddButton.signal_clicked().connect(sigc::mem_fun(*this, &GtkResolution::on_add_clause_clicked));
@@ -81,34 +72,38 @@ void GtkResolution::init() {
   m_ClauseTextScrolledWindow.add(m_ClauseText);
   m_ClauseTextScrolledWindow.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
 
+
+  //Create the sections of the resolution
+  Gtk::TreeModel::iterator iter = m_refResolutionModel->append();
+  Gtk::TreeModel::Row row = *iter;
+  row[m_resolutionColumns.m_phrase] = "Preamble";
+  iter = m_refResolutionModel->append();
+  row = *iter;
+  row[m_resolutionColumns.m_phrase] = "Body";
+
   show_all_children();
 }
 
-void GtkResolution::on_title_changed() {
-  m_resolution->setIssue(m_title.get_text());
-}
-
-void GtkResolution::on_main_submitter_changed() {
-  m_resolution->setMainSubmitter(m_submitter_entry.get_text());
+Resolution* GtkResolution::generate() {
+  return generate_resolution_from_model();
 }
 
 void GtkResolution::on_add_clause_clicked() {
-  Gtk::TreeModel::iterator iter = m_ResolutionTreeView.get_selection()->get_selected();
+  resolutionColumns m_resolutionColumns;
+  Gtk::TreeModel::iterator selection = m_ResolutionTreeView.get_selection()->get_selected();
+  Gtk::TreeModel::iterator iter = m_refResolutionModel->insert_after(selection);
   Gtk::TreeModel::Row row = *iter;
-  resolutionColumns resolutionColumns;
-  Clause *clause;
-  std::string phrase = row[resolutionColumns.m_phrase];
-  if (phrase == "Preamble") clause = new PreambulatoryClause;
-  else if (phrase == "Body") clause = new OperativeClause;
+  row[m_resolutionColumns.m_phrase] = m_title.get_text();
+  row[m_resolutionColumns.m_text] = m_ClauseText.get_buffer()->get_text();
 }
 
-void GtkResolution::populate_model_from_resolution() {
+void GtkResolution::populate_model_from_resolution(Resolution* resolution) {
   Gtk::TreeModel::iterator iter = m_refResolutionModel->prepend();
   Gtk::TreeModel::Row row;
   resolutionColumns m_resolutionColumns;
   row = *iter;
   //Populate the preamble first...
-  ClauseComposition *preamble = m_resolution->getPreamble();
+  ClauseComposition *preamble = resolution->getPreamble();
   row[m_resolutionColumns.m_phrase] = "Preamble";
   Gtk::TreeModel::iterator iter_child = m_refResolutionModel->append(row.children());
   Gtk::TreeModel::Row row_child = *iter_child;
@@ -119,11 +114,35 @@ void GtkResolution::populate_model_from_resolution() {
   //Next populate the body
   iter = m_refResolutionModel->prepend();
   row = *iter;
-  ClauseComposition *body = m_resolution->getBody();
+  ClauseComposition *body = resolution->getBody();
   row[m_resolutionColumns.m_phrase] = "Body";
   iter_child = m_refResolutionModel->append(row.children());
   for(std::deque<Clause*>::iterator it = body->getBegin(); it != body->getEnd(); it++) {
     row_child[m_resolutionColumns.m_phrase] = (*it)->getPhrase();
     row_child[m_resolutionColumns.m_text] = (*it)->getText();
+  }
+}
+
+Resolution* GtkResolution::generate_resolution_from_model() {
+  resolutionColumns m_resolutionColumns;
+  Resolution* resolution = new Resolution;
+  Clause* clause;
+  Glib::ustring string;
+  Gtk::TreeModel::Children children = m_refResolutionModel->children();
+  for(Gtk::TreeModel::Children::iterator iter = children.begin(); iter != children.end(); ++iter) {
+    Gtk::TreeModel::Row row = *iter;
+    string = row[m_resolutionColumns.m_phrase];
+    if (string == "Preamble") {
+      for(Gtk::TreeModel::Children::iterator child_iter = row.children().begin(); iter != row.children().end(); ++child_iter) {
+	    Gtk::TreeModel::Row child_row = *child_iter;
+	    clause = new PreambulatoryClause(child_row[m_resolutionColumns.m_phrase], child_row[m_resolutionColumns.m_text]);
+	  }
+      }
+    if (string == "Body") {
+	for(Gtk::TreeModel::Children::iterator child_iter = row.children().begin(); child_iter != row.children().end(); ++child_iter) {
+	    Gtk::TreeModel::Row child_row = *child_iter;
+	    clause = new OperativeClause(child_row[m_resolutionColumns.m_phrase], child_row[m_resolutionColumns.m_text]);
+	  }
+      }
   }
 }

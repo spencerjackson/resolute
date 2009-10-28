@@ -39,9 +39,9 @@ along with Resolute.  If not, see <http://www.gnu.org/licenses/>.*/
 class GtkResolution : public Gtk::VBox {
 public:
   GtkResolution();
-  GtkResolution(Resolution* resolution);
   ~GtkResolution();
   void init();
+  Resolution* generate();
 protected:
   Gtk::HBox m_header_box;
   Gtk::Label m_title_label;
@@ -66,12 +66,9 @@ protected:
   Gtk::ScrolledWindow m_ClauseTextScrolledWindow;
   Gtk::TextView m_ClauseText;
 
-  void populate_model_from_resolution();
+  void populate_model_from_resolution(Resolution* resolution);
+  Resolution* generate_resolution_from_model();
 
-  Resolution* m_resolution;
-
-  void on_title_changed();
-  void on_main_submitter_changed();
   void on_add_clause_clicked();
 
 };
