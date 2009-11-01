@@ -74,6 +74,9 @@ protected:
   void on_add_clause_clicked();
   void on_add_subclause_clicked();
   void on_delete_clause_clicked();
+  void on_selection_changed();
+  void on_phrase_changed();
+  void on_text_changed();
 };
 
 #endif //GTKRESOLUTION_H

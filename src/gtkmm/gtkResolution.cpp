@@ -61,6 +61,7 @@ void GtkResolution::init() {
   text_renderer = dynamic_cast <Gtk::CellRendererText*>(pColumn->get_first_cell_renderer());
   text_renderer->property_wrap_mode() = Pango::WRAP_WORD_CHAR;
   text_renderer->property_wrap_width() = 500;
+  m_ResolutionTreeView.get_selection()->signal_changed().connect(sigc::mem_fun(*this, &GtkResolution::on_selection_changed));
   m_VPaned.add2(m_ClauseVBox);
   m_ClauseAddButton.set_label("Add a new Clause");
   m_ClauseAddButton.signal_clicked().connect(sigc::mem_fun(*this, &GtkResolution::on_add_clause_clicked));
@@ -73,10 +74,12 @@ void GtkResolution::init() {
   m_ClauseButtonBox.pack_start(m_ClauseDeleteButton, Gtk::PACK_SHRINK);
   m_ClausePhraseHBox.pack_start(m_ClausePhraseLabel, Gtk::PACK_SHRINK);
   m_ClausePhraseLabel.set_label("Phrase");
+  m_ClausePhraseEntry.signal_changed().connect(sigc::mem_fun(*this, &GtkResolution::on_phrase_changed));
   m_ClausePhraseHBox.pack_start(m_ClausePhraseEntry, Gtk::PACK_SHRINK);
   m_ClauseVBox.pack_start(m_ClauseButtonBox, Gtk::PACK_SHRINK);
   m_ClauseVBox.pack_start(m_ClausePhraseHBox, Gtk::PACK_SHRINK);
   m_ClauseVBox.pack_start(m_ClauseTextScrolledWindow);
+  m_ClauseText.get_buffer()->signal_changed().connect(sigc::mem_fun(*this, &GtkResolution::on_text_changed));
   m_ClauseTextScrolledWindow.add(m_ClauseText);
   m_ClauseTextScrolledWindow.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
   m_ClauseText.set_wrap_mode(Gtk::WRAP_WORD);
@@ -122,6 +125,38 @@ void GtkResolution::on_delete_clause_clicked() {
   if (!(selection->get_value(m_resolutionColumns.m_phrase) == "Preamble" || selection->get_value(m_resolutionColumns.m_phrase) == "Body")) {
   m_refResolutionModel->erase(selection);
   }
+}
+
+void GtkResolution::on_selection_changed() {
+  resolutionColumns m_resolutionColumns;
+  Gtk::TreeModel::iterator selection = m_ResolutionTreeView.get_selection()->get_selected();
+  Gtk::TreeModel::Row row = *selection;
+  m_ClausePhraseEntry.set_text(row.get_value(m_resolutionColumns.m_phrase));
+  m_ClauseText.get_buffer()->set_text(row.get_value(m_resolutionColumns.m_text));
+
+  //Disallow editing on section headers
+  if(Gtk::TreePath(selection).to_string().find(":", 0) == Glib::ustring::npos) {
+    m_ClausePhraseEntry.property_editable() = false;
+    m_ClauseText.property_editable() = false;
+  }
+  else {
+    m_ClausePhraseEntry.property_editable() = true;
+    m_ClauseText.property_editable() = true;
+  }
+}
+
+void GtkResolution::on_phrase_changed() {
+  resolutionColumns m_resolutionColumns;
+  Gtk::TreeModel::iterator selection = m_ResolutionTreeView.get_selection()->get_selected();
+  Gtk::TreeModel::Row row = *selection;
+  if (Gtk::TreePath(selection).to_string().find(":", 0) != Glib::ustring::npos) row.set_value(m_resolutionColumns.m_phrase, std::string(m_ClausePhraseEntry.get_text()));
+}
+
+void GtkResolution::on_text_changed() {
+  resolutionColumns m_resolutionColumns;
+  Gtk::TreeModel::iterator selection = m_ResolutionTreeView.get_selection()->get_selected();
+  Gtk::TreeModel::Row row = *selection;
+  if (Gtk::TreePath(selection).to_string().find(":", 0) != Glib::ustring::npos) row.set_value(m_resolutionColumns.m_text, std::string(m_ClauseText.get_buffer()->get_text()));
 }
 
 void GtkResolution::populate_model_from_resolution(Resolution* resolution) {
