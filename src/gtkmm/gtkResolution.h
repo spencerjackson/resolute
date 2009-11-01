@@ -22,6 +22,7 @@ along with Resolute.  If not, see <http://www.gnu.org/licenses/>.*/
 #include <gtkmm/entry.h>
 #include <gtkmm/label.h>
 #include <gtkmm/button.h>
+#include <gtkmm/buttonbox.h>
 #include <gtkmm/frame.h>
 #include <gtkmm/scrolledwindow.h>
 #include <glibmm/refptr.h>
@@ -57,6 +58,7 @@ protected:
   Gtk::TreeView m_ResolutionTreeView;
   Glib::RefPtr<Gtk::TreeStore> m_refResolutionModel;
   Gtk::VBox m_ClauseVBox;
+  Gtk::HButtonBox m_ClauseButtonBox;
   Gtk::Button m_ClauseAddButton;
   Gtk::Button m_SubClauseAddButton;
   Gtk::Button m_ClauseDeleteButton;
@@ -70,7 +72,8 @@ protected:
   Resolution* generate_resolution_from_model();
 
   void on_add_clause_clicked();
-
+  void on_add_subclause_clicked();
+  void on_delete_clause_clicked();
 };
 
 #endif //GTKRESOLUTION_H

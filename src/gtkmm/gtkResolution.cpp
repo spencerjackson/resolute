@@ -65,14 +65,17 @@ void GtkResolution::init() {
   m_ClauseAddButton.set_label("Add a new Clause");
   m_ClauseAddButton.signal_clicked().connect(sigc::mem_fun(*this, &GtkResolution::on_add_clause_clicked));
   m_SubClauseAddButton.set_label("Add a new Subclause");
+  m_SubClauseAddButton.signal_clicked().connect(sigc::mem_fun(*this, &GtkResolution::on_add_subclause_clicked));
   m_ClauseDeleteButton.set_label("Delete a Clause");
-  m_ClauseVBox.pack_start(m_ClauseAddButton, Gtk::PACK_SHRINK);
-  m_ClauseVBox.pack_start(m_SubClauseAddButton, Gtk::PACK_SHRINK);
-  m_ClauseVBox.pack_start(m_ClauseDeleteButton, Gtk::PACK_SHRINK);
-  m_ClauseVBox.pack_start(m_ClausePhraseHBox, Gtk::PACK_SHRINK);
+  m_ClauseDeleteButton.signal_clicked().connect(sigc::mem_fun(*this, &GtkResolution::on_delete_clause_clicked));
+  m_ClauseButtonBox.pack_start(m_ClauseAddButton, Gtk::PACK_SHRINK);
+  m_ClauseButtonBox.pack_start(m_SubClauseAddButton, Gtk::PACK_SHRINK);
+  m_ClauseButtonBox.pack_start(m_ClauseDeleteButton, Gtk::PACK_SHRINK);
   m_ClausePhraseHBox.pack_start(m_ClausePhraseLabel, Gtk::PACK_SHRINK);
   m_ClausePhraseLabel.set_label("Phrase");
   m_ClausePhraseHBox.pack_start(m_ClausePhraseEntry, Gtk::PACK_SHRINK);
+  m_ClauseVBox.pack_start(m_ClauseButtonBox, Gtk::PACK_SHRINK);
+  m_ClauseVBox.pack_start(m_ClausePhraseHBox, Gtk::PACK_SHRINK);
   m_ClauseVBox.pack_start(m_ClauseTextScrolledWindow);
   m_ClauseTextScrolledWindow.add(m_ClauseText);
   m_ClauseTextScrolledWindow.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
@@ -96,10 +99,29 @@ Resolution* GtkResolution::generate() {
 void GtkResolution::on_add_clause_clicked() {
   resolutionColumns m_resolutionColumns;
   Gtk::TreeModel::iterator selection = m_ResolutionTreeView.get_selection()->get_selected();
-  Gtk::TreeModel::iterator iter = m_refResolutionModel->insert_after(selection);
-  Gtk::TreeModel::Row row = *iter;
-  row[m_resolutionColumns.m_phrase] = m_title.get_text();
-  row[m_resolutionColumns.m_text] = m_ClauseText.get_buffer()->get_text();
+  Gtk::TreeModel::iterator iter;
+  //If someone adds a clause to a section, handle that here
+  if (selection->get_value(m_resolutionColumns.m_phrase) == "Preamble" || selection->get_value(m_resolutionColumns.m_phrase) == "Body") {
+    iter = m_refResolutionModel->append(selection->children());
+  }
+  //If the selection isn't a section header, put it after the clause selected
+  else {
+    iter = m_refResolutionModel->insert_after(selection);
+  }
+}
+
+void GtkResolution::on_add_subclause_clicked() {
+  resolutionColumns m_resolutionColumns;
+  Gtk::TreeModel::iterator selection = m_ResolutionTreeView.get_selection()->get_selected();
+  m_refResolutionModel->append(selection->children());
+}
+
+void GtkResolution::on_delete_clause_clicked() {
+  Gtk::TreeModel::iterator selection = m_ResolutionTreeView.get_selection()->get_selected();
+  resolutionColumns m_resolutionColumns;
+  if (!(selection->get_value(m_resolutionColumns.m_phrase) == "Preamble" || selection->get_value(m_resolutionColumns.m_phrase) == "Body")) {
+  m_refResolutionModel->erase(selection);
+  }
 }
 
 void GtkResolution::populate_model_from_resolution(Resolution* resolution) {
