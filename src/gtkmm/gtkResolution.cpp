@@ -52,10 +52,15 @@ void GtkResolution::init() {
   m_ResolutionScrolledWindow.add(m_ResolutionTreeView);
   m_ResolutionScrolledWindow.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
   resolutionColumns m_resolutionColumns;
-  m_ResolutionTreeView.append_column("Phrase", m_resolutionColumns.m_phrase);
-  m_ResolutionTreeView.append_column("Text", m_resolutionColumns.m_text);
   m_refResolutionModel = Gtk::TreeStore::create(m_resolutionColumns);
   m_ResolutionTreeView.set_model(m_refResolutionModel);
+  m_ResolutionTreeView.append_column("Phrase", m_resolutionColumns.m_phrase);
+  Gtk::CellRendererText* text_renderer;
+  int cols_count = m_ResolutionTreeView.append_column("Text", m_resolutionColumns.m_text);
+  Gtk::TreeViewColumn* pColumn = m_ResolutionTreeView.get_column(cols_count-1);
+  text_renderer = dynamic_cast <Gtk::CellRendererText*>(pColumn->get_first_cell_renderer());
+  text_renderer->property_wrap_mode() = Pango::WRAP_WORD_CHAR;
+  text_renderer->property_wrap_width() = 500;
   m_VPaned.add2(m_ClauseVBox);
   m_ClauseAddButton.set_label("Add a new Clause");
   m_ClauseAddButton.signal_clicked().connect(sigc::mem_fun(*this, &GtkResolution::on_add_clause_clicked));
@@ -71,7 +76,7 @@ void GtkResolution::init() {
   m_ClauseVBox.pack_start(m_ClauseTextScrolledWindow);
   m_ClauseTextScrolledWindow.add(m_ClauseText);
   m_ClauseTextScrolledWindow.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
-
+  m_ClauseText.set_wrap_mode(Gtk::WRAP_WORD);
 
   //Create the sections of the resolution
   Gtk::TreeModel::iterator iter = m_refResolutionModel->append();
