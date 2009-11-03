@@ -42,7 +42,7 @@ public:
   GtkResolution();
   ~GtkResolution();
   void init();
-  Resolution* generate();
+  Resolution generate();
 protected:
   Gtk::HBox m_header_box;
   Gtk::Label m_title_label;
@@ -68,8 +68,11 @@ protected:
   Gtk::ScrolledWindow m_ClauseTextScrolledWindow;
   Gtk::TextView m_ClauseText;
 
-  void populate_model_from_resolution(Resolution* resolution);
-  Resolution* generate_resolution_from_model();
+  void generate_model_from_resolution(Resolution* resolution);
+  Resolution generate_resolution_from_model();
+  ClauseComposition generate_preamble();
+  ClauseComposition generate_body();
+  OperativeClause generate_operative_clause(Gtk::TreeIter iterator);
 
   void on_add_clause_clicked();
   void on_add_subclause_clicked();

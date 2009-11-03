@@ -94,6 +94,7 @@ void Resolute::on_action_file_open() {
 }
 
 void Resolute::on_action_file_save() {
+  Resolution resolution = m_resolution->generate();
   std::cout << "Save Resolution. Functionality not yet implemented." << std::endl;
 }
 

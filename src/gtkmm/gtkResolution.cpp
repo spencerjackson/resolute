@@ -95,7 +95,7 @@ void GtkResolution::init() {
   show_all_children();
 }
 
-Resolution* GtkResolution::generate() {
+Resolution GtkResolution::generate() {
   return generate_resolution_from_model();
 }
 
@@ -159,7 +159,7 @@ void GtkResolution::on_text_changed() {
   if (Gtk::TreePath(selection).to_string().find(":", 0) != Glib::ustring::npos) row.set_value(m_resolutionColumns.m_text, std::string(m_ClauseText.get_buffer()->get_text()));
 }
 
-void GtkResolution::populate_model_from_resolution(Resolution* resolution) {
+void GtkResolution::generate_model_from_resolution(Resolution* resolution) {
   Gtk::TreeModel::iterator iter = m_refResolutionModel->prepend();
   Gtk::TreeModel::Row row;
   resolutionColumns m_resolutionColumns;
@@ -185,26 +185,54 @@ void GtkResolution::populate_model_from_resolution(Resolution* resolution) {
   }
 }
 
-Resolution* GtkResolution::generate_resolution_from_model() {
+Resolution GtkResolution::generate_resolution_from_model() {
+  Resolution resolution;
+
+  ClauseComposition preamble = generate_preamble();
+  ClauseComposition body = generate_body();
+
+  resolution.set_preamble(preamble);
+  resolution.set_body(body);
+
+  return resolution;
+}
+
+ClauseComposition GtkResolution::generate_preamble() {
   resolutionColumns m_resolutionColumns;
-  Resolution* resolution = new Resolution;
-  Clause* clause;
-  Glib::ustring string;
-  Gtk::TreeModel::Children children = m_refResolutionModel->children();
-  for(Gtk::TreeModel::Children::iterator iter = children.begin(); iter != children.end(); ++iter) {
-    Gtk::TreeModel::Row row = *iter;
-    string = row[m_resolutionColumns.m_phrase];
-    if (string == "Preamble") {
-      for(Gtk::TreeModel::Children::iterator child_iter = row.children().begin(); iter != row.children().end(); ++child_iter) {
-	    Gtk::TreeModel::Row child_row = *child_iter;
-	    clause = new PreambulatoryClause(child_row[m_resolutionColumns.m_phrase], child_row[m_resolutionColumns.m_text]);
-	  }
-      }
-    if (string == "Body") {
-	for(Gtk::TreeModel::Children::iterator child_iter = row.children().begin(); child_iter != row.children().end(); ++child_iter) {
-	    Gtk::TreeModel::Row child_row = *child_iter;
-	    clause = new OperativeClause(child_row[m_resolutionColumns.m_phrase], child_row[m_resolutionColumns.m_text]);
-	  }
-      }
+  ClauseComposition preamble;
+  PreambulatoryClause clause;
+  Gtk::TreeModel::iterator section = m_refResolutionModel->get_iter("0"); //get the iterator to the preamble header
+
+  for(Gtk::TreeIter iterator = section->children().begin(); iterator != section->children().end(); iterator++) {
+    clause = PreambulatoryClause(iterator->get_value(m_resolutionColumns.m_phrase), iterator->get_value(m_resolutionColumns.m_text));
+    preamble.addClause(clause);
   }
+  return preamble;
+}
+
+ClauseComposition GtkResolution::generate_body() {
+  resolutionColumns m_resolutionColumns;
+  ClauseComposition body;
+  OperativeClause clause;
+  Gtk::TreeModel::iterator section = m_refResolutionModel->get_iter("1"); //get the iterator to the body header
+
+  for(Gtk::TreeModel::Children::iterator iterator = section->children().begin(); iterator != section->children().end(); iterator++) {
+      clause = generate_operative_clause(iterator);
+      body.addClause(clause);
+    }
+    return body;
+}
+
+OperativeClause GtkResolution::generate_operative_clause(Gtk::TreeIter iterator) {
+  resolutionColumns m_resolutionColumns;
+  OperativeClause clause(iterator->get_value(m_resolutionColumns.m_phrase), iterator->get_value(m_resolutionColumns.m_text));
+  OperativeClause subclause;
+
+  if (iterator->children().empty()) {return clause;}
+
+  for(Gtk::TreeModel::Children::iterator child = iterator->children().begin(); child != iterator->children().end(); child++) {
+    subclause = generate_operative_clause(child);
+    clause.addClause(subclause);
+  }
+  return clause;
 }
