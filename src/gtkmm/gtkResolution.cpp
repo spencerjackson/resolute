@@ -154,7 +154,7 @@ void GtkResolution::on_text_changed() {
 }
 
 void GtkResolution::generate_model_from_resolution(Resolution* resolution) {
-  Gtk::TreeModel::iterator iter = m_refResolutionModel->prepend();
+  Gtk::TreeModel::iterator iter = m_refResolutionModel->append();
   Gtk::TreeModel::Row row;
   row = *iter;
   //Populate the preamble first...
@@ -165,16 +165,34 @@ void GtkResolution::generate_model_from_resolution(Resolution* resolution) {
   for(std::deque<Clause*>::iterator it = preamble->getBegin(); it != preamble->getEnd(); it++) {
     row_child[m_refResolutionModel->m_columns.m_phrase] = (*it)->getPhrase();
     row_child[m_refResolutionModel->m_columns.m_text] = (*it)->getText();
+    Gtk::TreeModel::iterator iter_child = m_refResolutionModel->append(row.children());
   }
   //Next populate the body
-  iter = m_refResolutionModel->prepend();
+  iter = m_refResolutionModel->append();
   row = *iter;
   ClauseComposition *body = resolution->getBody();
   row[m_refResolutionModel->m_columns.m_phrase] = "Body";
-  iter_child = m_refResolutionModel->append(row.children());
   for(std::deque<Clause*>::iterator it = body->getBegin(); it != body->getEnd(); it++) {
+    iter_child = m_refResolutionModel->append(row.children());
+    row_child = *iter_child;
     row_child[m_refResolutionModel->m_columns.m_phrase] = (*it)->getPhrase();
     row_child[m_refResolutionModel->m_columns.m_text] = (*it)->getText();
+    if(!row_child.children().empty()) {
+      generate_model_operative_clause(body, it, row_child.children());
+    }
+  }
+}
+
+void GtkResolution::generate_model_operative_clause(ClauseComposition* section, std::deque<Clause*>::iterator iterator, Gtk::TreeNodeChildren clauses) {
+  Gtk::TreeIter iter = clauses.begin();
+  Gtk::TreeRow row = *iter;
+  for(std::deque<Clause*>::iterator i = iterator; i != section->getEnd(); i++) {
+    row[m_refResolutionModel->m_columns.m_phrase] = (*i)->getPhrase();
+    row[m_refResolutionModel->m_columns.m_text] = (*i)->getText();
+    if(!row.children().empty()) {
+      generate_model_operative_clause(section, i, row.children());
+    }
+    row = *(++iter);
   }
 }
 

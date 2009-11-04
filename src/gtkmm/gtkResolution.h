@@ -70,6 +70,7 @@ protected:
   Gtk::TextView m_ClauseText;
 
   void generate_model_from_resolution(Resolution* resolution);
+  void generate_model_operative_clause(ClauseComposition* section, std::deque<Clause*>::iterator iterator, Gtk::TreeNodeChildren clauses);
   Resolution generate_resolution_from_model();
   ClauseComposition generate_preamble();
   ClauseComposition generate_body();
