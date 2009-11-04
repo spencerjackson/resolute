@@ -27,12 +27,4 @@ public:
   Gtk::TreeModelColumn<std::string> m_sponsor;
 };
 
-class resolutionColumns : public Gtk::TreeModelColumnRecord {
-public:
-  resolutionColumns() {add(m_phrase); add(m_text);}
-  ~resolutionColumns() {}
-  Gtk::TreeModelColumn<std::string> m_phrase;
-  Gtk::TreeModelColumn<std::string> m_text;
-};
-
 #endif // MODELCOLUMNS_H

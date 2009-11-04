@@ -33,6 +33,7 @@ along with Resolute.  If not, see <http://www.gnu.org/licenses/>.*/
 #include <gtkmm/treeview.h>
 
 #include "modelColumns.h"
+#include "resolutionModel.h"
 
 #include "../resolution.h"
 #include "../clause.h"
@@ -56,7 +57,7 @@ protected:
   Gtk::VPaned m_VPaned;
   Gtk::ScrolledWindow m_ResolutionScrolledWindow;
   Gtk::TreeView m_ResolutionTreeView;
-  Glib::RefPtr<Gtk::TreeStore> m_refResolutionModel;
+  Glib::RefPtr<ResolutionModel> m_refResolutionModel;
   Gtk::VBox m_ClauseVBox;
   Gtk::HButtonBox m_ClauseButtonBox;
   Gtk::Button m_ClauseAddButton;

@@ -9,6 +9,7 @@ add_executable(resolute
     main.cpp
     about.cpp
     resolute.cpp
+    resolutionModel.cpp
     gtkResolution.cpp )
 
 target_link_libraries(resolute
