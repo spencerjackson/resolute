@@ -1,4 +1,4 @@
-/* File: modelColumns.h
+/* File: sponsorModel.h
 Copyright 2009 Spencer Jackson
 
 This file is part of Resolute
@@ -15,16 +15,25 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Resolute.  If not, see <http://www.gnu.org/licenses/>.*/
 
-#ifndef MODELCOLUMNS_H
-#define MODELCOLUMNS_H
-#include <gtkmm/treemodel.h>
-#include <string>
+#ifndef SPONSOR_MODEL_H
+#define SPONSOR_MODEL_H
 
-class sponsorColumns : public Gtk::TreeModelColumnRecord {
+#include"gtkmm/liststore.h"
+
+class SponsorModel : public Gtk::ListStore {
 public:
-  sponsorColumns() {add(m_sponsor);}
-  ~sponsorColumns() {}
-  Gtk::TreeModelColumn<std::string> m_sponsor;
+  static Glib::RefPtr<SponsorModel> create();
+
+  class sponsorColumns : public Gtk::TreeModelColumnRecord {
+  public:
+    sponsorColumns() {add(m_sponsor);}
+    ~sponsorColumns() {}
+    Gtk::TreeModelColumn<std::string> m_sponsor;
+  } m_columns;
+  protected:
+    SponsorModel();
+    ~SponsorModel();
 };
 
-#endif // MODELCOLUMNS_H
+
+#endif /* SPONSOR_MODEL_H */

@@ -38,14 +38,9 @@ void GtkResolution::init() {
   m_sponsor_scrolledwindow.add(m_sponsor_view);
   m_sponsor_scrolledwindow.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
 
-  sponsorColumns m_sponsorColumns;
-  m_sponsor_view.append_column("Sponsors", m_sponsorColumns.m_sponsor);
-  m_refSponsorsModel = Gtk::ListStore::create(m_sponsorColumns);
+  m_refSponsorsModel = SponsorModel::create();
+  m_sponsor_view.append_column("Sponsors", m_refSponsorsModel->m_columns.m_sponsor);
   m_sponsor_view.set_model(m_refSponsorsModel);
-  for(int i = 0; i < 50; i++) {
-    Gtk::TreeModel::Row row = *(m_refSponsorsModel->append());
-    row[m_sponsorColumns.m_sponsor] = "China";
-  }
 
   pack_start(m_VPaned);
   m_VPaned.add1(m_ResolutionScrolledWindow);

@@ -10,6 +10,7 @@ add_executable(resolute
     about.cpp
     resolute.cpp
     resolutionModel.cpp
+    sponsorModel.cpp
     gtkResolution.cpp )
 
 target_link_libraries(resolute

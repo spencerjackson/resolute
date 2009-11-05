@@ -32,8 +32,8 @@ along with Resolute.  If not, see <http://www.gnu.org/licenses/>.*/
 #include <gtkmm/treestore.h>
 #include <gtkmm/treeview.h>
 
-#include "modelColumns.h"
 #include "resolutionModel.h"
+#include "sponsorModel.h"
 
 #include "../resolution.h"
 #include "../clause.h"
@@ -51,7 +51,7 @@ protected:
   Gtk::Label m_submitter_label;
   Gtk::Entry m_submitter_entry;
   Gtk::ScrolledWindow m_sponsor_scrolledwindow;
-  Glib::RefPtr<Gtk::ListStore> m_refSponsorsModel;
+  Glib::RefPtr<SponsorModel> m_refSponsorsModel;
   Gtk::TreeView m_sponsor_view;
 
   Gtk::VPaned m_VPaned;
