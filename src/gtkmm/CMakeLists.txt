@@ -11,6 +11,8 @@ add_executable(resolute
     resolute.cpp
     resolutionModel.cpp
     sponsorModel.cpp
+    gtkResolutionSponsors.cpp
+    gtkResolutionClauses.cpp
     gtkResolution.cpp )
 
 target_link_libraries(resolute

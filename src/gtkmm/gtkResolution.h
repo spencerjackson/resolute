@@ -21,19 +21,12 @@ along with Resolute.  If not, see <http://www.gnu.org/licenses/>.*/
 #include <gtkmm/box.h>
 #include <gtkmm/entry.h>
 #include <gtkmm/label.h>
-#include <gtkmm/button.h>
-#include <gtkmm/buttonbox.h>
-#include <gtkmm/frame.h>
-#include <gtkmm/scrolledwindow.h>
-#include <glibmm/refptr.h>
-#include <gtkmm/paned.h>
-#include <gtkmm/textview.h>
-#include <gtkmm/liststore.h>
-#include <gtkmm/treestore.h>
-#include <gtkmm/treeview.h>
 
 #include "resolutionModel.h"
 #include "sponsorModel.h"
+
+#include "gtkResolutionSponsors.h"
+#include "gtkResolutionClauses.h"
 
 #include "../resolution.h"
 #include "../clause.h"
@@ -50,38 +43,13 @@ protected:
   Gtk::Entry m_title;
   Gtk::Label m_submitter_label;
   Gtk::Entry m_submitter_entry;
-  Gtk::ScrolledWindow m_sponsor_scrolledwindow;
-  Glib::RefPtr<SponsorModel> m_refSponsorsModel;
-  Gtk::TreeView m_sponsor_view;
 
-  Gtk::VPaned m_VPaned;
-  Gtk::ScrolledWindow m_ResolutionScrolledWindow;
-  Gtk::TreeView m_ResolutionTreeView;
-  Glib::RefPtr<ResolutionModel> m_refResolutionModel;
-  Gtk::VBox m_ClauseVBox;
-  Gtk::HButtonBox m_ClauseButtonBox;
-  Gtk::Button m_ClauseAddButton;
-  Gtk::Button m_SubClauseAddButton;
-  Gtk::Button m_ClauseDeleteButton;
-  Gtk::HBox m_ClausePhraseHBox;
-  Gtk::Label m_ClausePhraseLabel;
-  Gtk::Entry m_ClausePhraseEntry;
-  Gtk::ScrolledWindow m_ClauseTextScrolledWindow;
-  Gtk::TextView m_ClauseText;
+  GtkResolutionSponsors m_sponsors;
+  GtkResolutionClauses m_clauses;
 
   void generate_model_from_resolution(Resolution* resolution);
   void generate_model_operative_clause(ClauseComposition* section, std::deque<Clause*>::iterator iterator, Gtk::TreeNodeChildren clauses);
   Resolution generate_resolution_from_model();
-  ClauseComposition generate_preamble();
-  ClauseComposition generate_body();
-  OperativeClause generate_operative_clause(Gtk::TreeIter iterator);
-
-  void on_add_clause_clicked();
-  void on_add_subclause_clicked();
-  void on_delete_clause_clicked();
-  void on_selection_changed();
-  void on_phrase_changed();
-  void on_text_changed();
 };
 
 #endif //GTKRESOLUTION_H
