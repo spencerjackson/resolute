@@ -35,9 +35,14 @@ void GtkResolution::init() {
   pack_start(m_header_box, Gtk::PACK_SHRINK);
   m_submitter_entry.set_text("Main Submitter");
 
-  pack_start(m_sponsors);
+  pack_start(m_pane);
 
-  pack_start(m_clauses);
+  m_pane.add1(m_sponsors);
+  m_pane.add2(m_clauses);
+
+  m_pane.set_position(150); /*This changes the sizes of the two parts of the
+			      resolution, rather arbitrarily.
+			      For some reason get_position returns zero*/
 
   show_all_children();
 }

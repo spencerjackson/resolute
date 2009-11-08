@@ -21,6 +21,7 @@ along with Resolute.  If not, see <http://www.gnu.org/licenses/>.*/
 #include <gtkmm/box.h>
 #include <gtkmm/entry.h>
 #include <gtkmm/label.h>
+#include <gtkmm/paned.h>
 
 #include "resolutionModel.h"
 #include "sponsorModel.h"
@@ -43,6 +44,8 @@ protected:
   Gtk::Entry m_title;
   Gtk::Label m_submitter_label;
   Gtk::Entry m_submitter_entry;
+
+  Gtk::VPaned m_pane;
 
   GtkResolutionSponsors m_sponsors;
   GtkResolutionClauses m_clauses;

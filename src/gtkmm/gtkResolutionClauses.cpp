@@ -2,7 +2,7 @@
 
 GtkResolutionClauses::GtkResolutionClauses() {
   add(m_VPaned);
-  m_VPaned.add1(m_ResolutionScrolledWindow);
+  m_VPaned.pack1(m_ResolutionScrolledWindow, true, true);
   m_ResolutionScrolledWindow.add(m_TreeView);
   m_ResolutionScrolledWindow.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
   m_refModel = ResolutionModel::create();
@@ -16,7 +16,7 @@ GtkResolutionClauses::GtkResolutionClauses() {
   text_renderer->property_wrap_width() = 500;
   m_TreeView.get_selection()->signal_changed().connect(sigc::mem_fun(*this, &GtkResolutionClauses::on_selection_changed));
   m_TreeView.set_reorderable();
-  m_VPaned.add2(m_ClauseVBox);
+  m_VPaned.pack2(m_ClauseVBox, false, false);
   m_ClauseAddButton.set_label("Add a new Clause");
   m_ClauseAddButton.signal_clicked().connect(sigc::mem_fun(*this, &GtkResolutionClauses::on_add_clause_clicked));
   m_SubClauseAddButton.set_label("Add a new Subclause");
@@ -37,6 +37,9 @@ GtkResolutionClauses::GtkResolutionClauses() {
   m_TextScrolledWindow.add(m_Text);
   m_TextScrolledWindow.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
   m_Text.set_wrap_mode(Gtk::WRAP_WORD);
+  m_VPaned.set_position(300); /*This changes the sizes of the clause tree and
+				the editing widgets, arbitrarily.
+				For some reason get_position returns zero*/
 
   //Create the sections of the resolution
   Gtk::TreeModel::iterator iter = m_refModel->append();
